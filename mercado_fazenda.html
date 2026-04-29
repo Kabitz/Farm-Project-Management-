@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Farm Project System - Mercado Fazenda</title>
+
+<!-- PWA: Web app manifest & home-screen install -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a6ed1">
+<meta name="application-name" content="Mercado Fazenda">
+
+<!-- iOS Safari home-screen support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mercado">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sap-blue: #0a6ed1;
+    --sap-blue-dark: #085caf;
+    --sap-blue-light: #d1e8ff;
+    --sap-bg: #f7f7f7;
+    --sap-bg-shell: #354a5f;
+    --sap-bg-shell-dark: #2c3e50;
+    --sap-border: #d9d9d9;
+    --sap-border-light: #e5e5e5;
+    --sap-text: #32363a;
+    --sap-text-light: #6a6d70;
+    --sap-text-disabled: #a9a9a9;
+    --sap-success: #107e3e;
+    --sap-success-bg: #e4f1e4;
+    --sap-warning: #df6e0c;
+    --sap-warning-bg: #fef0e4;
+    --sap-error: #bb0000;
+    --sap-error-bg: #ffebeb;
+    --sap-row-hover: #ebf5fe;
+    --sap-row-selected: #d1e8ff;
+    --sap-tile-bg: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', 'Arial', sans-serif;
+    font-size: 14px;
+    color: var(--sap-text);
+    background: var(--sap-bg);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Shell Bar - top SAP navigation */
+  .shell-bar {
+    background: var(--sap-bg-shell);
+    color: white;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--sap-bg-shell-dark);
+  }
+  .shell-bar-logo {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    color: #fff;
+    padding-right: 16px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .shell-bar-title {
+    font-size: 14px;
+    font-weight: 400;
+    margin-left: 16px;
+    color: #e5e5e5;
+  }
+  .shell-bar-spacer { flex: 1; }
+  .shell-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 4px;
+  }
+  .shell-icon:hover { background: rgba(255,255,255,0.1); }
+  .shell-user {
+    width: 32px; height: 32px;
+    background: #8a98a8; color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  /* Sub-header / breadcrumb */
+  .sub-header {
+    background: white;
+    height: 48px;
+    border-bottom: 1px solid var(--sap-border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .breadcrumb a { color: var(--sap-blue); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb-sep { color: var(--sap-text-light); }
+  .breadcrumb-current { color: var(--sap-text); font-weight: 600; }
+
+  /* Main project header */
+  .project-header {
+    background: white;
+    padding: 16px 24px 0;
+    border-bottom: 1px solid var(--sap-border);
+  }
+  .project-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .project-title-block h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--sap-text);
+    margin-bottom: 2px;
+  }
+  .project-title-block .subtitle {
+    font-size: 13px;
+    color: var(--sap-text-light);
+  }
+  .project-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--sap-success-bg);
+    color: var(--sap-success);
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  /* Header attribute grid */
+  .header-attrs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px 24px;
+    padding: 8px 0 16px;
+  }
+  .attr-block .attr-label {
+    font-size: 11px;
+    color: var(--sap-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+  .attr-block .attr-value {
+    font-size: 14px;
+    color: var(--sap-text);
+    font-weight: 600;
+  }
+  .attr-block .attr-value.editable {
+    cursor: pointer;
+    border-bottom: 1px dashed transparent;
+  }
+  .attr-block .attr-value.editable:hover {
+    border-bottom-color: var(--sap-blue);
+    color: var(--sap-blue);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--sap-border);
+    background: white;
+    padding: 0 24px;
+  }
+  .tab {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--sap-text-light);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    font-weight: 400;
+  }
+  .tab:hover { color: var(--sap-text); }
+  .tab.active {
+    color: var(--sap-blue);
+    border-bottom-color: var(--sap-blue);
+    font-weight: 600;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    background: white;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--sap-border);
+  }
+  .btn {
+    padding: 5px 12px;
+    background: white;
+    border: 1px solid var(--sap-border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--sap-text);
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.1s;
+  }
+  .btn:hover {
+    background: #f0f0f0;
+    border-color: #b3b3b3;
+  }
+  .btn:active { background: #e0e0e0; }
+  .btn-primary {
+    background: var(--sap-blue);
+    color: white;
+    border-color: var(--sap-blue);
+  }
+  .btn-primary:hover {
+    background: var(--sap-blue-dark);
+    border-color: var(--sap-blue-dark);
+  }
+  .btn-danger {
+    color: var(--sap-error);
+  }
+  .btn-icon { font-size: 14px; line-height: 1; }
+  .toolbar-spacer { flex: 1; }
+  .toolbar-search {
+    padding: 5px 10px;
+    border: 1px solid var(--sap-border);
+    border-radius: 3px;
+    font-size: 13px;
+    width: 200px;
+    font-family: inherit;
+  }
+  .toolbar-search:focus {
+    outline: none;
+    border-color: var(--sap-blue);
+  }
+
+  /* Content area */
+  .content {
+    height: calc(100vh - 44px - 48px - 142px - 41px - 47px);
+    overflow: auto;
+    background: white;
+  }
+
+  /* WBS Table */
+  .wbs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .wbs-table thead th {
+    background: #fafafa;
+    color: var(--sap-text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--sap-border);
+    border-right: 1px solid var(--sap-border-light);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  .wbs-table thead th:last-child { border-right: none; }
+  .wbs-table thead th.num { text-align: right; }
+
+  .wbs-table tbody td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--sap-border-light);
+    border-right: 1px solid var(--sap-border-light);
+    vertical-align: middle;
+  }
+  .wbs-table tbody td:last-child { border-right: none; }
+  .wbs-table tbody tr {
+    transition: background 0.05s;
+  }
+  .wbs-table tbody tr:hover { background: var(--sap-row-hover); }
+  .wbs-table tbody tr.selected { background: var(--sap-row-selected); }
+
+  /* Row level styles */
+  .row-l1 { background: #eef4fa; font-weight: 700; }
+  .row-l1:hover { background: #e0ecf6 !important; }
+  .row-l2 { background: #f7fafc; font-weight: 600; }
+  .row-l2:hover { background: #ecf3f8 !important; }
+  .row-l3 .wbs-id { color: var(--sap-text-light); font-weight: 400; }
+
+  /* WBS column */
+  .wbs-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--sap-text);
+    white-space: nowrap;
+  }
+  .wbs-desc {
+    display: flex;
+    align-items: center;
+    min-width: 280px;
+  }
+  .wbs-toggle {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--sap-text-light);
+    margin-right: 4px;
+    user-select: none;
+    font-size: 10px;
+  }
+  .wbs-toggle.no-children { visibility: hidden; }
+  .wbs-icon {
+    margin-right: 8px;
+    font-size: 14px;
+  }
+  .editable-cell {
+    cursor: text;
+    min-width: 60px;
+    display: inline-block;
+    padding: 1px 3px;
+    border-radius: 2px;
+  }
+  .editable-cell:hover {
+    outline: 1px solid var(--sap-blue);
+    outline-offset: -1px;
+    background: white;
+  }
+  .editable-cell:focus {
+    outline: 2px solid var(--sap-blue);
+    outline-offset: -2px;
+    background: white;
+  }
+  /* zero-value price hint - subtle gray when 0,00 */
+  td.num-cell .editable-cell[data-field="price"] {
+    font-variant-numeric: tabular-nums;
+  }
+  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Per-column zero-out icon in header */
+  .col-zero {
+    display: inline-block;
+    width: 16px; height: 16px;
+    line-height: 14px;
+    text-align: center;
+    border: 1px solid var(--sap-border);
+    border-radius: 50%;
+    margin-left: 4px;
+    cursor: pointer;
+    color: var(--sap-text-light);
+    background: white;
+    font-size: 10px;
+    font-weight: 700;
+    transition: all 0.1s;
+    vertical-align: middle;
+  }
+  .col-zero:hover {
+    background: var(--sap-error);
+    color: white;
+    border-color: var(--sap-error);
+  }
+
+  /* Status pills */
+  .status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .status-released { background: var(--sap-success-bg); color: var(--sap-success); }
+  .status-progress { background: var(--sap-blue-light); color: var(--sap-blue-dark); }
+  .status-created { background: #f0f0f0; color: var(--sap-text-light); }
+  .status-completed { background: #e8e8e8; color: #555; text-decoration: line-through; text-decoration-color: rgba(0,0,0,0.3); }
+  .status-blocked { background: var(--sap-error-bg); color: var(--sap-error); }
+
+  /* Priority */
+  .priority-cell { text-align: center; }
+  .priority-1 { color: var(--sap-error); font-weight: 700; }
+  .priority-2 { color: var(--sap-warning); font-weight: 600; }
+  .priority-3 { color: var(--sap-text-light); }
+
+  /* Status bar at bottom */
+  .status-bar {
+    background: #fafafa;
+    height: 32px;
+    border-top: 1px solid var(--sap-border);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--sap-text-light);
+    gap: 18px;
+  }
+  .status-bar .stat strong {
+    color: var(--sap-text);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .status-bar-spacer { flex: 1; }
+  .legend-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* Modal / Inline edit popover */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 4px;
+    width: 480px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--sap-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .modal-close {
+    cursor: pointer;
+    color: var(--sap-text-light);
+    font-size: 20px;
+    line-height: 1;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+  }
+  .modal-close:hover { background: #f0f0f0; }
+  .modal-body { padding: 18px; }
+  .modal-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--sap-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    background: #fafafa;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    color: var(--sap-text-light);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--sap-border);
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: inherit;
+    background: white;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--sap-blue);
+    box-shadow: 0 0 0 2px var(--sap-blue-light);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* KPI Tiles for overview */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px;
+    background: var(--sap-bg);
+  }
+  .kpi-tile {
+    background: white;
+    border-radius: 4px;
+    padding: 16px;
+    border-top: 3px solid var(--sap-blue);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .kpi-tile.green { border-top-color: var(--sap-success); }
+  .kpi-tile.orange { border-top-color: var(--sap-warning); }
+  .kpi-tile.gray { border-top-color: #888; }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--sap-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--sap-text);
+    line-height: 1;
+  }
+  .kpi-unit {
+    font-size: 14px;
+    color: var(--sap-text-light);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--sap-text-light);
+    margin-top: 4px;
+  }
+
+  /* Project cards in launchpad */
+  .project-card {
+    background: white;
+    border-radius: 4px;
+    border-top: 4px solid var(--sap-blue);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .project-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+  .project-card.green { border-top-color: var(--sap-success); }
+  .project-card.orange { border-top-color: var(--sap-warning); }
+  .project-card.purple { border-top-color: #925ace; }
+  .project-card.red { border-top-color: var(--sap-error); }
+  .project-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .project-card-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  .project-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sap-text);
+    margin-bottom: 2px;
+  }
+  .project-card-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--sap-text-light);
+    margin-bottom: 10px;
+  }
+  .project-card-desc {
+    font-size: 13px;
+    color: var(--sap-text-light);
+    margin-bottom: 12px;
+    min-height: 36px;
+  }
+  .project-card-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--sap-border-light);
+    font-size: 12px;
+  }
+  .project-card-stats .label {
+    color: var(--sap-text-light);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+  }
+  .project-card-stats .value {
+    font-weight: 700;
+    color: var(--sap-text);
+  }
+  .project-card-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    color: var(--sap-text-light);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .project-card:hover .project-card-delete { opacity: 1; }
+  .project-card-delete:hover {
+    background: var(--sap-error-bg);
+    color: var(--sap-error);
+  }
+
+  /* Hide sections */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Notification */
+  .notification {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: var(--sap-success);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateX(120%);
+    transition: transform 0.3s;
+    z-index: 200;
+  }
+  .notification.show { transform: translateX(0); }
+
+  /* PWA install prompt */
+  .install-prompt {
+    position: fixed;
+    bottom: 50px;
+    right: 20px;
+    background: var(--sap-blue);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(10,110,209,0.35);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    z-index: 150;
+    border: none;
+    font-family: inherit;
+    transition: transform 0.15s;
+  }
+  .install-prompt:hover { transform: translateY(-2px); }
+  .install-prompt.show { display: inline-flex; }
+
+  /* Confirm dialog */
+  select.status-select {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 2px;
+  }
+
+  /* Scrollbar */
+  .content::-webkit-scrollbar { width: 12px; height: 12px; }
+  .content::-webkit-scrollbar-track { background: #f5f5f5; }
+  .content::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 6px; border: 2px solid #f5f5f5; }
+  .content::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+</style>
+</head>
+<body>
+
+<!-- Shell Bar -->
+<div class="shell-bar">
+  <div class="shell-bar-logo">FPS</div>
+  <div class="shell-bar-title">Farm Project System — Project Builder</div>
+  <div class="shell-bar-spacer"></div>
+  <div class="shell-icon" title="Search">⌕</div>
+  <div class="shell-icon" title="Notifications">🔔</div>
+  <div class="shell-icon" title="Settings">⚙</div>
+  <div class="shell-user" title="Caetano">CA</div>
+</div>
+
+<!-- Sub-header / breadcrumb -->
+<div class="sub-header">
+  <div class="breadcrumb">
+    <a href="#" onclick="goToProjects(); return false;">My Projects</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current" id="bcCurrent">MERCFAZ-2026</span>
+  </div>
+</div>
+
+<!-- ============ PROJECTS LAUNCHPAD ============ -->
+<div id="projectsView" style="display:none; padding: 24px; background: var(--sap-bg); height: calc(100vh - 44px - 48px);">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px;">
+    <div>
+      <h1 style="font-size: 22px; font-weight: 700; color: var(--sap-text); margin-bottom: 4px;">My Projects</h1>
+      <div style="font-size: 13px; color: var(--sap-text-light);">Farm Project System · <span id="projectsCount">0</span> project(s)</div>
+    </div>
+    <button class="btn btn-primary" onclick="openNewProjectModal()" style="font-size:14px; padding:8px 16px;">
+      <span class="btn-icon">＋</span> Create New Project
+    </button>
+  </div>
+  <div id="projectsGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
+</div>
+
+<!-- ============ PROJECT DETAIL VIEW ============ -->
+<div id="projectDetailView">
+
+<!-- Project Header -->
+<div class="project-header">
+  <div class="project-title-row">
+    <div class="project-title-block">
+      <h1>
+        <span id="hdrTitle">Mercado Fazenda</span>
+        <span class="project-status-badge" id="hdrStatus">REL · Released</span>
+      </h1>
+      <div class="subtitle">Project Definition · <span id="hdrId">MERCFAZ-2026</span> · <span id="hdrDesc">Grocery Procurement for Farm Trip</span></div>
+    </div>
+    <button class="btn" onclick="goToProjects()" style="margin-left:12px;">
+      <span class="btn-icon">←</span> Back to Projects
+    </button>
+  </div>
+  <div class="header-attrs">
+    <div class="attr-block">
+      <div class="attr-label">Project ID</div>
+      <div class="attr-value" id="hdrProjId">MERCFAZ-2026</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Project Manager</div>
+      <div class="attr-value editable" data-field="pm" id="hdrPm">Caetano</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Start Date</div>
+      <div class="attr-value editable" data-field="start" id="hdrStart">29.04.2026</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Finish Date</div>
+      <div class="attr-value editable" data-field="end" id="hdrEnd">03.05.2026</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Currency</div>
+      <div class="attr-value editable" data-field="currency" id="hdrCurrency">BRL</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Plant</div>
+      <div class="attr-value" id="hdrPlant">1000 — Fazenda</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Cost Center</div>
+      <div class="attr-value" id="hdrCC">CC-FOOD-01</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Profit Center</div>
+      <div class="attr-value" id="hdrPC">PC-TRIP</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Responsible</div>
+      <div class="attr-value editable" data-field="resp" id="hdrResp">Caetano</div>
+    </div>
+    <div class="attr-block">
+      <div class="attr-label">Last Changed</div>
+      <div class="attr-value" id="lastChanged">29.04.2026 14:32</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="wbs">WBS Structure</div>
+  <div class="tab" data-tab="overview">Overview</div>
+  <div class="tab" data-tab="dates">Dates</div>
+  <div class="tab" data-tab="responsibility">Responsibility</div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="openAddModal()">
+    <span class="btn-icon">＋</span> Add WBS Element
+  </button>
+  <button class="btn" onclick="indentSelected()" title="Demote selected (Tab)">
+    <span class="btn-icon">→</span> Indent
+  </button>
+  <button class="btn" onclick="outdentSelected()" title="Promote selected (Shift+Tab)">
+    <span class="btn-icon">←</span> Outdent
+  </button>
+  <button class="btn btn-danger" onclick="deleteSelected()" title="Delete selected (Del)">
+    <span class="btn-icon">🗑</span> Delete
+  </button>
+  <button class="btn" onclick="expandAll()">Expand All</button>
+  <button class="btn" onclick="collapseAll()">Collapse All</button>
+  <div style="width:1px; height:22px; background:var(--sap-border); margin:0 4px;"></div>
+  <span style="font-size:11px; color:var(--sap-text-light); text-transform:uppercase; letter-spacing:0.3px; font-weight:600; margin-right:2px;">Bulk:</span>
+  <button class="btn" onclick="bulkStatus()" title="Change status for selected scope">
+    <span class="btn-icon">⚡</span> Set Status
+  </button>
+  <button class="btn" onclick="zeroOutModal()" title="Reset numeric values to zero">
+    <span class="btn-icon">∅</span> Zero Out
+  </button>
+  <div class="toolbar-spacer"></div>
+  <span id="savedIndicator" style="font-size:12px; color:var(--sap-success); margin-right:8px; font-weight:600;">✓ Auto-saved</span>
+  <input type="text" class="toolbar-search" id="searchInput" placeholder="Filter items..." oninput="filterTable(this.value)">
+  <button class="btn" onclick="exportCSV()" title="Export to CSV">
+    <span class="btn-icon">⤓</span> Export
+  </button>
+  <button class="btn btn-danger" onclick="resetToDefaults()" title="Reset all data to original">
+    <span class="btn-icon">↺</span> Reset
+  </button>
+  <button class="btn" onclick="saveData()">
+    <span class="btn-icon">💾</span> Save
+  </button>
+</div>
+
+<!-- Content area -->
+<div class="content">
+
+  <!-- WBS Tab -->
+  <div class="tab-content active" id="tab-wbs">
+    <table class="wbs-table" id="wbsTable">
+      <thead>
+        <tr>
+          <th style="width: 130px;">WBS Element</th>
+          <th>Description</th>
+          <th style="width: 90px;">Category</th>
+          <th class="num" style="width: 70px;">
+            Qty <span class="col-zero" onclick="zeroColumn('qty')" title="Zero out all Qty values">∅</span>
+          </th>
+          <th style="width: 60px;">UoM</th>
+          <th class="num" style="width: 90px;">
+            Unit Price <span class="col-zero" onclick="zeroColumn('price')" title="Zero out all Unit Price values">∅</span>
+          </th>
+          <th class="num" style="width: 100px;">Plan Cost</th>
+          <th style="width: 110px;">Status</th>
+          <th style="width: 60px;">Prio</th>
+          <th style="width: 130px;">Responsible</th>
+          <th style="width: 100px;">Vendor</th>
+        </tr>
+      </thead>
+      <tbody id="wbsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Overview Tab -->
+  <div class="tab-content" id="tab-overview">
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">Total Plan Cost</div>
+        <div class="kpi-value">R$ <span id="kpiTotal">0.00</span></div>
+        <div class="kpi-sub">Across all WBS elements</div>
+      </div>
+      <div class="kpi-tile green">
+        <div class="kpi-label">Items Completed</div>
+        <div class="kpi-value"><span id="kpiCompleted">0</span><span class="kpi-unit">/ <span id="kpiTotalCount">0</span></span></div>
+        <div class="kpi-sub">Released for purchase</div>
+      </div>
+      <div class="kpi-tile orange">
+        <div class="kpi-label">Open Items</div>
+        <div class="kpi-value"><span id="kpiOpen">0</span></div>
+        <div class="kpi-sub">In progress or created</div>
+      </div>
+      <div class="kpi-tile gray">
+        <div class="kpi-label">WBS Elements</div>
+        <div class="kpi-value"><span id="kpiElements">0</span></div>
+        <div class="kpi-sub">Total in structure</div>
+      </div>
+    </div>
+    <div style="padding: 0 20px 20px;">
+      <div style="background: white; border-radius: 4px; padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 15px; margin-bottom: 12px; font-weight: 700;">Cost Distribution by Category</h3>
+        <div id="categoryChart" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dates Tab -->
+  <div class="tab-content" id="tab-dates">
+    <div style="padding: 24px;">
+      <h3 style="font-size: 15px; margin-bottom: 14px; font-weight: 700;">Schedule Overview</h3>
+      <table class="wbs-table">
+        <thead>
+          <tr>
+            <th style="width:130px;">WBS Element</th>
+            <th>Description</th>
+            <th style="width:120px;">Earliest Start</th>
+            <th style="width:120px;">Earliest Finish</th>
+            <th style="width:90px;">Duration</th>
+          </tr>
+        </thead>
+        <tbody id="datesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Responsibility Tab -->
+  <div class="tab-content" id="tab-responsibility">
+    <div style="padding: 24px;">
+      <h3 style="font-size: 15px; margin-bottom: 14px; font-weight: 700;">Responsibility Assignment Matrix</h3>
+      <table class="wbs-table">
+        <thead>
+          <tr>
+            <th style="width:130px;">WBS Element</th>
+            <th>Description</th>
+            <th style="width:140px;">Responsible</th>
+            <th style="width:120px;">Vendor</th>
+            <th class="num" style="width:120px;">Plan Cost</th>
+          </tr>
+        </thead>
+        <tbody id="respBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Status bar -->
+<div class="status-bar">
+  <div class="stat"><strong id="sbCount">0</strong> elements</div>
+  <div class="stat"><strong>Total:</strong> R$ <span id="sbTotal">0.00</span></div>
+  <div class="stat"><strong>Completed:</strong> <span id="sbCompleted">0%</span></div>
+  <div class="status-bar-spacer"></div>
+  <div><span class="legend-dot" style="background: #107e3e;"></span>Completed</div>
+  <div><span class="legend-dot" style="background: #0a6ed1;"></span>In Progress</div>
+  <div><span class="legend-dot" style="background: #df6e0c;"></span>Created</div>
+  <div><span class="legend-dot" style="background: #bb0000;"></span>Blocked</div>
+  <div class="stat" style="margin-left: 12px;">System: FPS-100 | Client: 100 | User: CAETANO</div>
+</div>
+
+</div><!-- /projectDetailView -->
+
+<!-- New Project Modal -->
+<div class="modal-overlay" id="newProjectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Create New Project</h3>
+      <span class="modal-close" onclick="closeNewProjectModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Project Name *</label>
+        <input type="text" class="form-input" id="npName" placeholder="e.g. Churrasco Junho 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Project ID *</label>
+        <input type="text" class="form-input" id="npId" placeholder="e.g. CHURR-2026" style="font-family: 'JetBrains Mono', monospace;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-input" id="npDesc" placeholder="Brief description...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="text" class="form-input" id="npStart" placeholder="29.04.2026">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Finish Date</label>
+          <input type="text" class="form-input" id="npEnd" placeholder="03.05.2026">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Project Manager</label>
+          <input type="text" class="form-input" id="npPm" value="Caetano">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Card Color</label>
+          <select class="form-select" id="npColor">
+            <option value="">Blue (default)</option>
+            <option value="green">Green</option>
+            <option value="orange">Orange</option>
+            <option value="purple">Purple</option>
+            <option value="red">Red</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Starter Template</label>
+        <select class="form-select" id="npTemplate">
+          <option value="empty">Empty project (just root WBS)</option>
+          <option value="grocery">Grocery shopping (Hortifruti, Carnes, Bebidas...)</option>
+          <option value="bbq">Churrasco (Carnes, Bebidas, Acompanhamentos)</option>
+          <option value="trip">Trip / Travel (Transporte, Hospedagem, Alimentação)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeNewProjectModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createProject()">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add WBS Element</h3>
+      <span class="modal-close" onclick="closeModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <input type="text" class="form-input" id="fldDesc" placeholder="e.g. Tomate, Picanha, Cerveja...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Parent Element</label>
+          <select class="form-select" id="fldParent"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="fldCategory">
+            <option>Hortifruti</option>
+            <option>Carnes</option>
+            <option>Padaria</option>
+            <option>Laticínios</option>
+            <option>Bebidas</option>
+            <option>Mercearia</option>
+            <option>Limpeza</option>
+            <option>Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-input" id="fldQty" value="1" step="0.1" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit of Measure</label>
+          <select class="form-select" id="fldUom">
+            <option>UN</option><option>KG</option><option>G</option>
+            <option>L</option><option>ML</option><option>PCT</option>
+            <option>CX</option><option>DZ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Unit Price (BRL)</label>
+          <input type="number" class="form-input" id="fldPrice" value="0.00" step="0.01" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="fldPriority">
+            <option value="1">1 - High</option>
+            <option value="2" selected>2 - Medium</option>
+            <option value="3">3 - Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Responsible</label>
+          <input type="text" class="form-input" id="fldResp" placeholder="Caetano">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vendor</label>
+          <input type="text" class="form-input" id="fldVendor" placeholder="Pão de Açúcar">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<button class="install-prompt" id="installBtn" onclick="installPwa()">
+  📱 Install App
+</button>
+
+<!-- Zero Out Modal -->
+<div class="modal-overlay" id="zeroModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Zero Out Values</h3>
+      <span class="modal-close" onclick="closeZeroModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Fields to reset</label>
+        <div style="display:flex; flex-direction:column; gap:6px; padding:8px 0;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" id="zeroQty" checked> Quantity
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" id="zeroPrice" checked> Unit Price
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Scope</label>
+        <select class="form-select" id="zeroScope">
+          <option value="all">All line items</option>
+          <option value="selected">Selected element + its children</option>
+          <option value="category">All items in a category…</option>
+        </select>
+      </div>
+      <div class="form-group" id="zeroCategoryGroup" style="display:none;">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="zeroCategory">
+          <option>Hortifruti</option>
+          <option>Carnes</option>
+          <option>Padaria</option>
+          <option>Laticínios</option>
+          <option>Bebidas</option>
+          <option>Mercearia</option>
+          <option>Limpeza</option>
+          <option>Outros</option>
+        </select>
+      </div>
+      <div style="background:#fef0e4; border-left:3px solid var(--sap-warning); padding:10px 12px; font-size:12px; color:var(--sap-text);">
+        <strong>Affecting <span id="zeroPreviewCount">0</span> line item(s).</strong>
+        Plan costs will recalculate to R$ 0.00 for matching rows.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeZeroModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyZero()">Reset Values</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Mass Status Change</h3>
+      <span class="modal-close" onclick="closeBulkModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Scope</label>
+        <select class="form-select" id="bulkScope">
+          <option value="all">All WBS elements</option>
+          <option value="leafs">All line items only (leaf nodes)</option>
+          <option value="selected">Selected element + its children</option>
+          <option value="category">All items in a category…</option>
+        </select>
+      </div>
+      <div class="form-group" id="bulkCategoryGroup" style="display:none;">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="bulkCategory">
+          <option>Hortifruti</option>
+          <option>Carnes</option>
+          <option>Padaria</option>
+          <option>Laticínios</option>
+          <option>Bebidas</option>
+          <option>Mercearia</option>
+          <option>Limpeza</option>
+          <option>Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Status</label>
+        <select class="form-select" id="bulkStatus">
+          <option value="CRTD">CRTD — Created</option>
+          <option value="PROG">PROG — In Progress</option>
+          <option value="REL" selected>REL — Released</option>
+          <option value="COMP">COMP — Completed</option>
+          <option value="BLCK">BLCK — Blocked</option>
+        </select>
+      </div>
+      <div style="background:#f7fafc; border-left:3px solid var(--sap-blue); padding:10px 12px; font-size:12px; color:var(--sap-text-light);">
+        <strong style="color:var(--sap-text);">Affecting <span id="bulkPreviewCount">0</span> element(s).</strong>
+        This action updates the system status for all matching items in the project structure.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeBulkModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyBulk()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== PERSISTENCE ==============
+const STORAGE_KEY = 'mercado_fazenda_wbs_v1';
+const HEADER_KEY = 'mercado_fazenda_header_v1';
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(wbs));
+    localStorage.setItem('mercado_fazenda_nextId', String(nextId));
+    // also save editable header fields
+    const header = {
+      pm: document.getElementById('hdrPm')?.textContent,
+      start: document.getElementById('hdrStart')?.textContent,
+      end: document.getElementById('hdrEnd')?.textContent,
+      currency: document.getElementById('hdrCurrency')?.textContent,
+      resp: document.getElementById('hdrResp')?.textContent,
+      lastChanged: document.getElementById('lastChanged')?.textContent
+    };
+    localStorage.setItem(HEADER_KEY, JSON.stringify(header));
+    updateSavedIndicator(true);
+  } catch (e) {
+    console.error('Persist failed:', e);
+    updateSavedIndicator(false, 'Save failed');
+  }
+}
+
+function loadPersisted() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        wbs = parsed;
+        const savedNextId = parseInt(localStorage.getItem('mercado_fazenda_nextId'));
+        if (!isNaN(savedNextId)) nextId = savedNextId;
+      }
+    }
+    const headerRaw = localStorage.getItem(HEADER_KEY);
+    if (headerRaw) {
+      const h = JSON.parse(headerRaw);
+      const setIfExists = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val) el.textContent = val;
+      };
+      setIfExists('hdrPm', h.pm);
+      setIfExists('hdrStart', h.start);
+      setIfExists('hdrEnd', h.end);
+      setIfExists('hdrCurrency', h.currency);
+      setIfExists('hdrResp', h.resp);
+      setIfExists('lastChanged', h.lastChanged);
+    }
+  } catch (e) {
+    console.error('Load failed:', e);
+  }
+}
+
+function resetToDefaults() {
+  if (!confirm('Reset everything to the original data? All your edits will be lost.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(HEADER_KEY);
+  localStorage.removeItem('mercado_fazenda_nextId');
+  location.reload();
+}
+
+let savedIndicatorTimer;
+function updateSavedIndicator(success, msg) {
+  const el = document.getElementById('savedIndicator');
+  if (!el) return;
+  clearTimeout(savedIndicatorTimer);
+  if (success) {
+    el.textContent = '✓ Saved';
+    el.style.color = 'var(--sap-success)';
+    savedIndicatorTimer = setTimeout(() => { el.textContent = '✓ Auto-saved'; }, 1200);
+  } else {
+    el.textContent = '⚠ ' + (msg || 'Save error');
+    el.style.color = 'var(--sap-error)';
+  }
+}
+
+// ============== DATA MODEL ==============
+let nextId = 1000;
+const STATUSES = [
+  { code: 'CRTD', label: 'Created', class: 'status-created' },
+  { code: 'PROG', label: 'In Progress', class: 'status-progress' },
+  { code: 'REL', label: 'Released', class: 'status-released' },
+  { code: 'COMP', label: 'Completed', class: 'status-completed' },
+  { code: 'BLCK', label: 'Blocked', class: 'status-blocked' }
+];
+
+// Initial WBS structure
+let wbs = [
+  { id: 1001, wbsId: 'MERCFAZ-2026', desc: 'Mercado Fazenda', level: 1, parent: null, expanded: true, category: '—', qty: '', uom: '', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+
+    { id: 1010, wbsId: 'MERCFAZ-2026.1', desc: 'Hortifruti', level: 2, parent: 1001, expanded: true, category: 'Hortifruti', qty: '', uom: '', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1015, wbsId: 'MERCFAZ-2026.1.5', desc: 'Batata', level: 3, parent: 1010, expanded: true, category: 'Hortifruti', qty: 0, uom: 'KG', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+
+    { id: 1020, wbsId: 'MERCFAZ-2026.2', desc: 'Carnes', level: 2, parent: 1001, expanded: true, category: 'Carnes', qty: '', uom: '', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1021, wbsId: 'MERCFAZ-2026.2.1', desc: 'Chester', level: 3, parent: 1020, expanded: true, category: 'Carnes', qty: 12, uom: 'KG', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+
+    { id: 1030, wbsId: 'MERCFAZ-2026.3', desc: 'Padaria & Laticínios', level: 2, parent: 1001, expanded: true, category: 'Padaria', qty: '', uom: '', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1031, wbsId: 'MERCFAZ-2026.3.1', desc: 'Pão francês', level: 3, parent: 1030, expanded: true, category: 'Padaria', qty: 0, uom: 'KG', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1035, wbsId: 'MERCFAZ-2026.3.5', desc: 'Leite', level: 3, parent: 1030, expanded: true, category: 'Laticínios', qty: 0, uom: 'L', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+
+    { id: 1040, wbsId: 'MERCFAZ-2026.4', desc: 'Bebidas', level: 2, parent: 1001, expanded: true, category: 'Bebidas', qty: '', uom: '', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1041, wbsId: 'MERCFAZ-2026.4.1', desc: 'Cerveja', level: 3, parent: 1040, expanded: true, category: 'Bebidas', qty: 0, uom: 'UN', price: 0, status: 'REL', priority: 1, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1042, wbsId: 'MERCFAZ-2026.4.2', desc: 'Refrigerante', level: 3, parent: 1040, expanded: true, category: 'Bebidas', qty: 0, uom: 'L', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+
+    { id: 1050, wbsId: 'MERCFAZ-2026.5', desc: 'Mercearia & Outros', level: 2, parent: 1001, expanded: true, category: 'Mercearia', qty: '', uom: '', price: 0, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' },
+      { id: 1051, wbsId: 'MERCFAZ-2026.5.1', desc: 'Pipoteca', level: 3, parent: 1050, expanded: true, category: 'Mercearia', qty: 0.22, uom: 'KG', price: 29.91, status: 'REL', priority: 2, resp: 'Caetano', vendor: 'Condor' }
+];
+nextId = 1100;
+
+let selectedId = null;
+let editingId = null;
+let activeTab = 'wbs';
+
+// ============== RENDERING ==============
+function isVisible(item) {
+  let p = item.parent;
+  while (p !== null) {
+    const parent = wbs.find(w => w.id === p);
+    if (!parent) break;
+    if (!parent.expanded) return false;
+    p = parent.parent;
+  }
+  return true;
+}
+
+function hasChildren(id) {
+  return wbs.some(w => w.parent === id);
+}
+
+function rollupCost(id) {
+  // Sum cost of own row plus all descendants
+  const item = wbs.find(w => w.id === id);
+  if (!item) return 0;
+  const children = wbs.filter(w => w.parent === id);
+  if (children.length === 0) {
+    return (parseFloat(item.qty) || 0) * (parseFloat(item.price) || 0);
+  }
+  return children.reduce((sum, c) => sum + rollupCost(c.id), 0);
+}
+
+function fmtMoney(n) {
+  return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function getStatusInfo(code) {
+  return STATUSES.find(s => s.code === code) || STATUSES[0];
+}
+
+function renderTable() {
+  const body = document.getElementById('wbsBody');
+  body.innerHTML = '';
+  let visibleCount = 0;
+
+  wbs.forEach(item => {
+    if (!isVisible(item)) return;
+    visibleCount++;
+    const row = document.createElement('tr');
+    row.className = `row-l${item.level}`;
+    if (item.id === selectedId) row.classList.add('selected');
+    row.dataset.id = item.id;
+    row.onclick = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.contentEditable === 'true') return;
+      selectedId = item.id;
+      renderTable();
+    };
+
+    const indent = (item.level - 1) * 18;
+    const childCount = wbs.filter(w => w.parent === item.id).length;
+    const toggle = childCount > 0
+      ? `<span class="wbs-toggle" onclick="event.stopPropagation(); toggleNode(${item.id})">${item.expanded ? '▼' : '▶'}</span>`
+      : `<span class="wbs-toggle no-children">·</span>`;
+    const icon = item.level === 1 ? '📋' : item.level === 2 ? '📁' : '📄';
+    const cost = rollupCost(item.id);
+
+    const statusInfo = getStatusInfo(item.status);
+    const isLeaf = childCount === 0;
+
+    row.innerHTML = `
+      <td><span class="wbs-id">${item.wbsId}</span></td>
+      <td>
+        <div class="wbs-desc" style="padding-left: ${indent}px;">
+          ${toggle}
+          <span class="wbs-icon">${icon}</span>
+          <span contenteditable="${isLeaf || item.level > 1 ? 'true' : 'true'}" class="editable-cell" data-field="desc" data-id="${item.id}">${item.desc}</span>
+        </div>
+      </td>
+      <td><span contenteditable="true" class="editable-cell" data-field="category" data-id="${item.id}">${item.category || ''}</span></td>
+      <td class="num-cell"><span contenteditable="${isLeaf}" class="editable-cell" data-field="qty" data-id="${item.id}">${item.qty !== '' && item.qty !== null && item.qty !== undefined ? item.qty : ''}</span></td>
+      <td><span contenteditable="${isLeaf}" class="editable-cell" data-field="uom" data-id="${item.id}">${item.uom || ''}</span></td>
+      <td class="num-cell"><span contenteditable="${isLeaf}" class="editable-cell" data-field="price" data-id="${item.id}" data-placeholder="0,00">${isLeaf ? fmtMoney(item.price || 0) : ''}</span></td>
+      <td class="num-cell"><strong>${fmtMoney(cost)}</strong></td>
+      <td>
+        <select class="status-select status-pill ${statusInfo.class}" data-id="${item.id}" onchange="changeStatus(${item.id}, this.value)" onclick="event.stopPropagation()">
+          ${STATUSES.map(s => `<option value="${s.code}" ${s.code === item.status ? 'selected' : ''}>${s.label}</option>`).join('')}
+        </select>
+      </td>
+      <td class="priority-cell priority-${item.priority}">${item.priority}</td>
+      <td><span contenteditable="true" class="editable-cell" data-field="resp" data-id="${item.id}">${item.resp || ''}</span></td>
+      <td><span contenteditable="true" class="editable-cell" data-field="vendor" data-id="${item.id}">${item.vendor || ''}</span></td>
+    `;
+    body.appendChild(row);
+  });
+
+  // wire up editable cells
+  document.querySelectorAll('.editable-cell').forEach(el => {
+    el.addEventListener('blur', handleCellBlur);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+      if (e.key === 'Escape') { el.textContent = el.dataset.original || el.textContent; el.blur(); }
+    });
+    el.addEventListener('focus', () => { el.dataset.original = el.textContent; });
+  });
+
+  updateStatusBar(visibleCount);
+  if (activeTab === 'overview') renderOverview();
+  if (activeTab === 'dates') renderDates();
+  if (activeTab === 'responsibility') renderResponsibility();
+}
+
+function handleCellBlur(e) {
+  const el = e.target;
+  const id = parseInt(el.dataset.id);
+  const field = el.dataset.field;
+  const item = wbs.find(w => w.id === id);
+  if (!item) return;
+  let val = el.textContent.trim();
+  if (field === 'qty' || field === 'price') {
+    // Accept Brazilian (1.234,56) or US (1,234.56) formats. Strip thousand sep, normalize decimal.
+    const cleaned = val.replace(/[R$\s]/g, '');
+    // If there's both . and , the last one is the decimal
+    let normalized;
+    if (cleaned.includes(',') && cleaned.includes('.')) {
+      // Use position of last separator as decimal
+      if (cleaned.lastIndexOf(',') > cleaned.lastIndexOf('.')) {
+        normalized = cleaned.replace(/\./g, '').replace(',', '.');
+      } else {
+        normalized = cleaned.replace(/,/g, '');
+      }
+    } else if (cleaned.includes(',')) {
+      normalized = cleaned.replace(',', '.');
+    } else {
+      normalized = cleaned;
+    }
+    val = parseFloat(normalized) || 0;
+  }
+  item[field] = val;
+  touchTimestamp();
+  renderTable();
+}
+
+function changeStatus(id, code) {
+  const item = wbs.find(w => w.id === id);
+  if (!item) return;
+  item.status = code;
+  // cascade to children if a parent is marked completed
+  if (code === 'COMP') {
+    const cascade = (pid) => {
+      wbs.filter(w => w.parent === pid).forEach(c => {
+        c.status = 'COMP';
+        cascade(c.id);
+      });
+    };
+    cascade(id);
+  }
+  touchTimestamp();
+  renderTable();
+}
+
+function toggleNode(id) {
+  const item = wbs.find(w => w.id === id);
+  if (item) { item.expanded = !item.expanded; renderTable(); }
+}
+
+function expandAll() { wbs.forEach(w => w.expanded = true); renderTable(); }
+function collapseAll() { wbs.forEach(w => { if (w.level > 1) w.expanded = false; }); renderTable(); }
+
+// ============== STATUS BAR ==============
+function updateStatusBar(visibleCount) {
+  const total = wbs.filter(w => !hasChildren(w.id))
+                   .reduce((s, w) => s + (parseFloat(w.qty)||0) * (parseFloat(w.price)||0), 0);
+  const leafs = wbs.filter(w => !hasChildren(w.id));
+  const completed = leafs.filter(w => w.status === 'COMP').length;
+  const pct = leafs.length > 0 ? Math.round((completed / leafs.length) * 100) : 0;
+  document.getElementById('sbCount').textContent = wbs.length;
+  document.getElementById('sbTotal').textContent = fmtMoney(total);
+  document.getElementById('sbCompleted').textContent = pct + '%';
+}
+
+// ============== OVERVIEW ==============
+function renderOverview() {
+  const leafs = wbs.filter(w => !hasChildren(w.id));
+  const total = leafs.reduce((s, w) => s + (parseFloat(w.qty)||0) * (parseFloat(w.price)||0), 0);
+  const completed = leafs.filter(w => w.status === 'COMP').length;
+  const open = leafs.filter(w => w.status !== 'COMP').length;
+  document.getElementById('kpiTotal').textContent = fmtMoney(total);
+  document.getElementById('kpiCompleted').textContent = completed;
+  document.getElementById('kpiTotalCount').textContent = leafs.length;
+  document.getElementById('kpiOpen').textContent = open;
+  document.getElementById('kpiElements').textContent = wbs.length;
+
+  // Category bar chart
+  const catTotals = {};
+  leafs.forEach(w => {
+    const c = w.category || 'Outros';
+    catTotals[c] = (catTotals[c] || 0) + (parseFloat(w.qty)||0) * (parseFloat(w.price)||0);
+  });
+  const max = Math.max(...Object.values(catTotals), 1);
+  const colors = ['#0a6ed1', '#107e3e', '#df6e0c', '#bb0000', '#925ace', '#5d36ff', '#cc6666', '#666'];
+  const chart = document.getElementById('categoryChart');
+  chart.innerHTML = Object.entries(catTotals)
+    .sort((a,b) => b[1]-a[1])
+    .map(([cat, val], i) => `
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:140px; font-size:13px; font-weight:600;">${cat}</div>
+        <div style="flex:1; background:#f0f0f0; border-radius:2px; height:22px; position:relative;">
+          <div style="width:${(val/max)*100}%; background:${colors[i % colors.length]}; height:100%; border-radius:2px; transition:width 0.4s;"></div>
+        </div>
+        <div style="width:110px; text-align:right; font-variant-numeric:tabular-nums; font-weight:600;">R$ ${fmtMoney(val)}</div>
+      </div>
+    `).join('');
+}
+
+function renderDates() {
+  const body = document.getElementById('datesBody');
+  // Generate sequential dates starting from project start
+  const start = new Date(2026, 3, 29); // 29 April 2026
+  body.innerHTML = wbs.filter(w => isVisible(w)).map((item, i) => {
+    const itemStart = new Date(start); itemStart.setDate(start.getDate() + Math.floor(i/3));
+    const itemEnd = new Date(itemStart); itemEnd.setDate(itemStart.getDate() + (item.level === 1 ? 4 : item.level === 2 ? 2 : 1));
+    const fmt = d => d.toLocaleDateString('pt-BR');
+    const dur = Math.ceil((itemEnd - itemStart)/(1000*60*60*24));
+    return `
+      <tr class="row-l${item.level}">
+        <td><span class="wbs-id">${item.wbsId}</span></td>
+        <td><div class="wbs-desc" style="padding-left:${(item.level-1)*18}px;">${item.desc}</div></td>
+        <td>${fmt(itemStart)}</td>
+        <td>${fmt(itemEnd)}</td>
+        <td>${dur} day(s)</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderResponsibility() {
+  const body = document.getElementById('respBody');
+  body.innerHTML = wbs.filter(w => isVisible(w)).map(item => {
+    const cost = rollupCost(item.id);
+    return `
+      <tr class="row-l${item.level}">
+        <td><span class="wbs-id">${item.wbsId}</span></td>
+        <td><div class="wbs-desc" style="padding-left:${(item.level-1)*18}px;">${item.desc}</div></td>
+        <td>${item.resp || '—'}</td>
+        <td>${item.vendor || '—'}</td>
+        <td class="num-cell"><strong>R$ ${fmtMoney(cost)}</strong></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ============== MODAL ==============
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Add WBS Element';
+  document.getElementById('fldDesc').value = '';
+  document.getElementById('fldQty').value = '1';
+  document.getElementById('fldPrice').value = '0.00';
+  document.getElementById('fldResp').value = 'Caetano';
+  document.getElementById('fldVendor').value = '';
+  // populate parent options - any element can be parent
+  const parentSel = document.getElementById('fldParent');
+  parentSel.innerHTML = wbs.filter(w => w.level < 3)
+    .map(w => `<option value="${w.id}" ${w.id === (selectedId || 1001) ? 'selected' : ''}>${w.wbsId} — ${w.desc}</option>`)
+    .join('');
+  document.getElementById('modal').classList.add('show');
+  setTimeout(() => document.getElementById('fldDesc').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  editingId = null;
+}
+
+function saveModal() {
+  const desc = document.getElementById('fldDesc').value.trim();
+  if (!desc) {
+    showNotification('Description is required', true);
+    return;
+  }
+  const parentId = parseInt(document.getElementById('fldParent').value);
+  const parent = wbs.find(w => w.id === parentId);
+  if (!parent) return;
+
+  // generate next WBS id
+  const siblings = wbs.filter(w => w.parent === parentId);
+  const nextNum = siblings.length + 1;
+  const newWbsId = `${parent.wbsId}.${nextNum}`;
+
+  const newItem = {
+    id: nextId++,
+    wbsId: newWbsId,
+    desc: desc,
+    level: parent.level + 1,
+    parent: parentId,
+    expanded: true,
+    category: document.getElementById('fldCategory').value,
+    qty: parseFloat(document.getElementById('fldQty').value) || 0,
+    uom: document.getElementById('fldUom').value,
+    price: parseFloat(document.getElementById('fldPrice').value) || 0,
+    status: 'CRTD',
+    priority: parseInt(document.getElementById('fldPriority').value),
+    resp: document.getElementById('fldResp').value || 'Caetano',
+    vendor: document.getElementById('fldVendor').value || '—'
+  };
+
+  // insert after last sibling (and after sibling's descendants)
+  let insertAt;
+  if (siblings.length > 0) {
+    const lastSib = siblings[siblings.length - 1];
+    let lastIdx = wbs.findIndex(w => w.id === lastSib.id);
+    // skip past descendants
+    for (let i = lastIdx + 1; i < wbs.length; i++) {
+      if (wbs[i].level <= lastSib.level) { insertAt = i; break; }
+    }
+    if (insertAt === undefined) insertAt = wbs.length;
+  } else {
+    insertAt = wbs.findIndex(w => w.id === parentId) + 1;
+  }
+  wbs.splice(insertAt, 0, newItem);
+  parent.expanded = true;
+  selectedId = newItem.id;
+  closeModal();
+  renderTable();
+  showNotification('WBS element ' + newWbsId + ' created');
+  touchTimestamp();
+}
+
+function deleteSelected() {
+  if (!selectedId) {
+    showNotification('Select a row first', true);
+    return;
+  }
+  if (selectedId === 1001) {
+    showNotification('Cannot delete root project', true);
+    return;
+  }
+  const item = wbs.find(w => w.id === selectedId);
+  if (!confirm(`Delete "${item.desc}" and all its sub-items?`)) return;
+  // delete recursively
+  const toDelete = new Set([selectedId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    wbs.forEach(w => {
+      if (toDelete.has(w.parent) && !toDelete.has(w.id)) {
+        toDelete.add(w.id);
+        changed = true;
+      }
+    });
+  }
+  wbs = wbs.filter(w => !toDelete.has(w.id));
+  selectedId = null;
+  renderTable();
+  showNotification(`Deleted ${toDelete.size} element(s)`);
+  touchTimestamp();
+}
+
+function indentSelected() {
+  showNotification('Use the Add modal to create child elements');
+}
+function outdentSelected() {
+  showNotification('Use the Add modal to reorganize structure');
+}
+
+// ============== BULK STATUS ==============
+function getBulkTargets() {
+  const scope = document.getElementById('bulkScope').value;
+  if (scope === 'all') return wbs.slice();
+  if (scope === 'leafs') return wbs.filter(w => !hasChildren(w.id));
+  if (scope === 'selected') {
+    if (!selectedId) return [];
+    const targets = [];
+    const collect = (id) => {
+      const item = wbs.find(w => w.id === id);
+      if (item) {
+        targets.push(item);
+        wbs.filter(w => w.parent === id).forEach(c => collect(c.id));
+      }
+    };
+    collect(selectedId);
+    return targets;
+  }
+  if (scope === 'category') {
+    const cat = document.getElementById('bulkCategory').value;
+    return wbs.filter(w => w.category === cat);
+  }
+  return [];
+}
+
+function refreshBulkPreview() {
+  document.getElementById('bulkPreviewCount').textContent = getBulkTargets().length;
+  document.getElementById('bulkCategoryGroup').style.display =
+    document.getElementById('bulkScope').value === 'category' ? '' : 'none';
+}
+
+function bulkStatus() {
+  // pre-select "selected scope" if a row is highlighted
+  document.getElementById('bulkScope').value = selectedId ? 'selected' : 'all';
+  document.getElementById('bulkStatus').value = 'REL';
+  refreshBulkPreview();
+  document.getElementById('bulkModal').classList.add('show');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulkModal').classList.remove('show');
+}
+
+function applyBulk() {
+  const targets = getBulkTargets();
+  const newStatus = document.getElementById('bulkStatus').value;
+  if (targets.length === 0) {
+    showNotification('No matching elements', true);
+    return;
+  }
+  targets.forEach(t => { t.status = newStatus; });
+  closeBulkModal();
+  renderTable();
+  showNotification(`Status set to ${getStatusInfo(newStatus).label} for ${targets.length} element(s)`);
+  touchTimestamp();
+}
+
+// ============== ZERO OUT ==============
+function getZeroTargets() {
+  const scope = document.getElementById('zeroScope').value;
+  const leafs = wbs.filter(w => !hasChildren(w.id));
+  if (scope === 'all') return leafs;
+  if (scope === 'selected') {
+    if (!selectedId) return [];
+    const targets = [];
+    const collect = (id) => {
+      const item = wbs.find(w => w.id === id);
+      if (!item) return;
+      if (!hasChildren(id)) targets.push(item);
+      wbs.filter(w => w.parent === id).forEach(c => collect(c.id));
+    };
+    collect(selectedId);
+    return targets;
+  }
+  if (scope === 'category') {
+    const cat = document.getElementById('zeroCategory').value;
+    return leafs.filter(w => w.category === cat);
+  }
+  return [];
+}
+
+function refreshZeroPreview() {
+  document.getElementById('zeroPreviewCount').textContent = getZeroTargets().length;
+  document.getElementById('zeroCategoryGroup').style.display =
+    document.getElementById('zeroScope').value === 'category' ? '' : 'none';
+}
+
+function zeroOutModal() {
+  document.getElementById('zeroScope').value = selectedId && selectedId !== 1001 ? 'selected' : 'all';
+  document.getElementById('zeroQty').checked = true;
+  document.getElementById('zeroPrice').checked = true;
+  refreshZeroPreview();
+  document.getElementById('zeroModal').classList.add('show');
+}
+
+function closeZeroModal() {
+  document.getElementById('zeroModal').classList.remove('show');
+}
+
+function applyZero() {
+  const targets = getZeroTargets();
+  const doQty = document.getElementById('zeroQty').checked;
+  const doPrice = document.getElementById('zeroPrice').checked;
+  if (!doQty && !doPrice) {
+    showNotification('Select at least one field', true);
+    return;
+  }
+  if (targets.length === 0) {
+    showNotification('No matching line items', true);
+    return;
+  }
+  targets.forEach(t => {
+    if (doQty) t.qty = 0;
+    if (doPrice) t.price = 0;
+  });
+  closeZeroModal();
+  renderTable();
+  const fields = [doQty && 'Qty', doPrice && 'Price'].filter(Boolean).join(' & ');
+  showNotification(`Zeroed ${fields} on ${targets.length} line item(s)`);
+  touchTimestamp();
+}
+
+function zeroColumn(field) {
+  const leafs = wbs.filter(w => !hasChildren(w.id));
+  const label = field === 'qty' ? 'Quantity' : 'Unit Price';
+  if (!confirm(`Zero out ${label} for all ${leafs.length} line items?`)) return;
+  leafs.forEach(t => { t[field] = 0; });
+  renderTable();
+  showNotification(`${label} zeroed on ${leafs.length} line item(s)`);
+  touchTimestamp();
+}
+
+// ============== UTILS ==============
+function showNotification(msg, isError) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.style.background = isError ? 'var(--sap-error)' : 'var(--sap-success)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function touchTimestamp() {
+  const now = new Date();
+  const fmt = n => String(n).padStart(2, '0');
+  document.getElementById('lastChanged').textContent =
+    `${fmt(now.getDate())}.${fmt(now.getMonth()+1)}.${now.getFullYear()} ${fmt(now.getHours())}:${fmt(now.getMinutes())}`;
+  persist();
+}
+
+function filterTable(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { renderTable(); return; }
+  document.querySelectorAll('#wbsBody tr').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+function exportCSV() {
+  const headers = ['WBS Element','Description','Category','Qty','UoM','Unit Price','Plan Cost','Status','Priority','Responsible','Vendor'];
+  const rows = wbs.map(w => [
+    w.wbsId, w.desc, w.category, w.qty, w.uom, w.price,
+    rollupCost(w.id).toFixed(2), getStatusInfo(w.status).label, w.priority, w.resp, w.vendor
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mercado_fazenda_wbs.csv';
+  a.click();
+  showNotification('Exported to CSV');
+}
+
+function saveData() {
+  persist();
+  showNotification('✓ Project saved to your browser. It will reload next time.');
+}
+
+// ============== TABS ==============
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    activeTab = t.dataset.tab;
+    document.getElementById('tab-' + activeTab).classList.add('active');
+    renderTable();
+  });
+});
+
+// ============== HEADER FIELD EDIT ==============
+document.querySelectorAll('.attr-value.editable').forEach(el => {
+  el.addEventListener('click', () => {
+    const current = el.textContent;
+    const next = prompt('Edit ' + el.dataset.field + ':', current);
+    if (next !== null && next.trim()) {
+      el.textContent = next.trim();
+      touchTimestamp();
+    }
+  });
+});
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if (e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Delete' && selectedId) deleteSelected();
+  if (e.key === 'n' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); openAddModal(); }
+});
+
+// wire bulk modal previews
+document.getElementById('bulkScope').addEventListener('change', refreshBulkPreview);
+document.getElementById('bulkCategory').addEventListener('change', refreshBulkPreview);
+
+// wire zero modal previews
+document.getElementById('zeroScope').addEventListener('change', refreshZeroPreview);
+document.getElementById('zeroCategory').addEventListener('change', refreshZeroPreview);
+
+// load any saved state, then render
+loadPersisted();
+renderTable();
+
+// PWA: register service worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.log('SW registration failed (only works when served via http/https):', err);
+    });
+  });
+}
+
+// PWA: capture install prompt and show our own button
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').classList.add('show');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').classList.remove('show');
+  deferredInstallPrompt = null;
+  showNotification('✓ App installed! Find it on your home screen.');
+});
+async function installPwa() {
+  if (!deferredInstallPrompt) {
+    // iOS doesn't fire beforeinstallprompt — give instructions
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      alert('To install on iOS:\n\n1. Tap the Share button (square with up arrow) in Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');
+    } else {
+      alert('Use your browser menu to "Add to Home Screen" or "Install app".');
+    }
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') {
+    document.getElementById('installBtn').classList.remove('show');
+  }
+  deferredInstallPrompt = null;
+}
+// On iOS Safari (no beforeinstallprompt), show button anyway if not already standalone
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.navigator.standalone) {
+  document.getElementById('installBtn').classList.add('show');
+}
+</script>
+
+</body>
+</html>
